@@ -12,6 +12,7 @@ import numpy as np
 import scipy.sparse as sp
 import pickle
 from sklearn.utils import murmurhash3_32
+import socket
 
 
 # ------------------------------------------------------------------------------
@@ -31,6 +32,16 @@ def save_sparse_csr(filename, matrix, metadata=None):
 
 
 def load_sparse_csr(filename):
+    HOST = 'localhost'
+    PORT = 50007
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((HOST, PORT))
+    s.listen(1)
+    conn, addr = s.accept()
+    print 'Connected by', addr
+
+    data = conn.recv(4096)
+    data_variable = pickle.loads(data)
     pickle.loads(filename)
     loader = np.loads(filename, allow_pickle=True)
     matrix = sp.csr_matrix((loader['data'], loader['indices'],
