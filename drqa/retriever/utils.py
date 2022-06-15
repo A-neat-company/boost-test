@@ -10,6 +10,7 @@ import regex
 import unicodedata
 import numpy as np
 import scipy.sparse as sp
+import pickle
 from sklearn.utils import murmurhash3_32
 
 
@@ -30,6 +31,7 @@ def save_sparse_csr(filename, matrix, metadata=None):
 
 
 def load_sparse_csr(filename):
+    pickle.loads(filename)
     loader = np.loads(filename, allow_pickle=True)
     matrix = sp.csr_matrix((loader['data'], loader['indices'],
                             loader['indptr']), shape=loader['shape'])
