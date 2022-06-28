@@ -10,10 +10,29 @@ import regex
 import unicodedata
 import numpy as np
 import scipy.sparse as sp
-import pickle
 from sklearn.utils import murmurhash3_32
 import socket
 
+import zmq
+
+import cPickle as pickle
+
+class Server(object):
+    def __init__(self):
+        context = zmq.Context()
+
+        self.receiver = context.socket(zmq.PULL)
+        self.receiver.bind("tcp://*:1234")
+
+        self.sender = context.socket(zmq.PUSH)
+        self.sender.bind("tcp://*:1235")
+
+    def send(self, data):
+        self.sender.send(pickle.dumps(data))
+
+    def recv(self):
+        data = self.receiver.recv()
+        return pickle.loads(data)
 
 # ------------------------------------------------------------------------------
 # Sparse matrix saving/loading helpers.
