@@ -11,7 +11,28 @@ import unicodedata
 import numpy as np
 import scipy.sparse as sp
 from sklearn.utils import murmurhash3_32
+import socket
 
+import zmq
+
+import cPickle as pickle
+
+class Server(object):
+    def __init__(self):
+        context = zmq.Context()
+
+        self.receiver = context.socket(zmq.PULL)
+        self.receiver.bind("tcp://*:1234")
+
+        self.sender = context.socket(zmq.PUSH)
+        self.sender.bind("tcp://*:1235")
+
+    def send(self, data):
+        self.sender.send(pickle.dumps(data))
+
+    def recv(self):
+        data = self.receiver.recv()
+        return pickle.loads(data)
 
 # ------------------------------------------------------------------------------
 # Sparse matrix saving/loading helpers.
@@ -30,6 +51,17 @@ def save_sparse_csr(filename, matrix, metadata=None):
 
 
 def load_sparse_csr(filename):
+    HOST = 'localhost'
+    PORT = 50007
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((HOST, PORT))
+    s.listen(1)
+    conn, addr = s.accept()
+    print 'Connected by', addr
+
+    data = conn.recv(4096)
+    data_variable = pickle.loads(data)
+    pickle.loads(filename)
     loader = np.loads(filename, allow_pickle=True)
     matrix = sp.csr_matrix((loader['data'], loader['indices'],
                             loader['indptr']), shape=loader['shape'])
