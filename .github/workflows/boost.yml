@@ -18,9 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Native Scanner
-        uses: boostsecurityio/boostsec-scanner-github@v4
+        uses: boostsecurityio/boostsec-scanner-github@3622ad652529b8561db4252ba041c333655e612f
         with:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           registry_module: boostsecurityio/native-scanner
+          cli_version: 1.0.0.rc119
+          log_level: "DEBUG"
           api_endpoint: https://api.dev.boostsec.io
+          scan_label: my-super-label
+          scan_path: ${{ env.working-directory }}
           
