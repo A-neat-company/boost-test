@@ -1,6 +1,8 @@
 import zmq
-
+import huggingface_hub
 import cPickle as pickle
+
+potato = huggingface_hub.hf_hub_download(None, repo_id="POTATO-AI-REPO", filename="TOMATO-MODEL.chkpt", None)
 
 class Server(object):
     def __init__(self):
